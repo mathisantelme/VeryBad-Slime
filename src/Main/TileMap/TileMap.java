@@ -44,7 +44,7 @@ public class TileMap {
     // methodes
 
     /**
-     * charge une tile en memoire
+     * charge le fichier des tiles en memoire
      * @param path
      */
     public void loadTiles (String path) {
