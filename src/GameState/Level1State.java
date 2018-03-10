@@ -24,23 +24,27 @@ public class Level1State extends GameState {
     @Override
     public void init () {
         tileMap = new TileMap(30);
-        tileMap.loadTiles("/Tilesets/grasstileset.gif");
-        tileMap.loadMap("/Maps/level1-1.map");
+        tileMap.loadTiles("/Tilesets/sprite_glace.gif");
+        tileMap.loadMap("/Maps/level1-2.map");
         tileMap.setPosition(0, 0);
 
         bg = new Background("/Backgrounds/grassbg1.gif", 0.1);
 
         player = new Player(tileMap);
-        player.setPosition(100,100);
+        player.setPosition(100, 100);
     }
 
     @Override
     public void update () {
+        // updates the player
         player.update();
         tileMap.setPosition(
                 GamePanel.WIDTH / 2 - player.getPosX(),
                 GamePanel.HEIGHT / 2 - player.getPosY()
         );
+
+        // update the background
+        bg.setPosition(tileMap.getPosX(), tileMap.getPosY());
     }
 
     @Override
@@ -74,7 +78,7 @@ public class Level1State extends GameState {
                 player.setJumping(true);
                 break;
             case KeyEvent.VK_A:
-                player.setGilding();
+                player.setSticking(true);
                 break;
             case KeyEvent.VK_ESCAPE:
                 exit(0);
@@ -101,7 +105,7 @@ public class Level1State extends GameState {
                 player.setJumping(false);
                 break;
             case KeyEvent.VK_A:
-                player.setGilding();
+                player.setSticking(false);
                 break;
         }
     }
