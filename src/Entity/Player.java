@@ -26,10 +26,6 @@ public class Player extends MapObject {
     private int scratchDmg;
     private int scratchRange;
 
-    // sticking
-    private boolean sticking;
-    private long stickingTimer;
-
     // animations
     private ArrayList<BufferedImage[]> sprites;
     // array that stores the number of frames per animations
@@ -127,15 +123,20 @@ public class Player extends MapObject {
     public void setSticking (boolean sticking) { this.sticking = sticking; }
 
     // methods
-    private void getNextPosition() {
-        // movement
-        if (left) { // deplacement a gauche
+    /**
+     * gère les différents mouvements du joueur
+     */
+    private void getNextPosition () {
+        // deplacement a gauche
+        if (left) {
             dx -= moveSpeed;
             if (dx < -maxSpeed) dx = -maxSpeed;
-        } else if (right) { // deplacement a droite
+        } // deplacement a droite
+        else if (right) {
             dx += moveSpeed;
             if (dx > maxSpeed) dx = maxSpeed;
-        } else { // arret du personnage
+        } // arret du personnage
+        else {
             if (dx > 0) {
                 dx -= stopSpeed;
                 if (dx < 0) dx = 0;
@@ -150,7 +151,6 @@ public class Player extends MapObject {
 
         // jumping
         if (jumping && !falling) {
-            sticking = false;
             dy = jumpStart;
             falling = true;
         }
@@ -159,29 +159,20 @@ public class Player extends MapObject {
         if (falling) {
             dy += fallSpeed;
 
-            if (dy > 0) jumping = false;
-            if (dy < 0 && !jumping) dy += stopJumpSpeed;
-
-            if (bottomLeft && topLeft) sticking = true;
-            if (dy > maxFallSpeed) dy = maxFallSpeed;
-        }
-
-        // sticking
-        if (sticking) {
-            dy += fallSpeed * 0.1;
+            if (dy > 0) jumping = false; // si le joueur tombe il ne peut plus sauter
+            if (dy < 0 && !jumping) dy += stopJumpSpeed; // retour au sol si le joueur ne saute plus
+            if (dy > maxFallSpeed) dy = maxFallSpeed; // on cap la vitesse de saut
         }
     }
 
+    /**
+     * met a jour la position du joueur et met a jour les animations du joueur
+     */
     public void update () {
         // update position
         getNextPosition();
         checkTileMapCollision();
         setPosition(xTemp, yTemp);
-
-        // check attack has played once
-        if (currentAction == JUMPING) {
-            if (animation.hasPlayedOnce()) jumping = false;
-        }
 
         // set animations
         if (scratching) { // gestion de l'attaque corps a corps
@@ -237,6 +228,10 @@ public class Player extends MapObject {
         }
     }
 
+    /**
+     * permet d'afficher le joueur a l'écran
+     * @param g
+     */
     public void draw (Graphics2D g) {
         setMapPosition(); // always call this method in any MapObject descendent's draw function
 

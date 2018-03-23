@@ -53,6 +53,7 @@ public abstract class MapObject {
 	protected boolean down;
 	protected boolean jumping;
 	protected boolean falling;
+	protected boolean sticking;
 	
 	// movement attributes
 	protected double moveSpeed;
@@ -83,7 +84,12 @@ public abstract class MapObject {
                 cHeight
 		);
 	}
-	
+
+	/**
+	 * permet de verifier les collisons d'un rectangle
+	 * @param x
+	 * @param y
+	 */
 	public void calculateCorners(double x, double y) {
 		
 		int leftTile = (int)(x - cWidth / 2) / tileSize;
@@ -115,6 +121,7 @@ public abstract class MapObject {
 		yTemp = posY;
 		
 		calculateCorners(posX, yDest);
+		// haut
 		if(dy < 0) {
 			if(topLeft || topRight) {
 				dy = 0;
@@ -124,6 +131,8 @@ public abstract class MapObject {
 				yTemp += dy;
 			}
 		}
+
+		// bas
 		if(dy > 0) {
 			if(bottomLeft || bottomRight) {
 				dy = 0;
@@ -131,35 +140,42 @@ public abstract class MapObject {
 				yTemp = (currRow + 1) * tileSize - cHeight / 2;
 			}
 			else {
-				yTemp += dy;
+				if (sticking && !jumping) {
+					yTemp += dy * 0.1;
+					System.out.println(dy);
+				}
+				else yTemp += dy;
 			}
 		}
 		
 		calculateCorners(xDest, posY);
+		// left
 		if(dx < 0) {
-			if(topLeft || bottomLeft) {
+			if((topLeft || bottomLeft) || (topLeft && bottomLeft)) {
 				dx = 0;
 				xTemp = currCol * tileSize + cWidth / 2;
-			}
-			else {
+				sticking = true;
+			} else {
 				xTemp += dx;
+				sticking = false;
 			}
 		}
+
+		// right
 		if(dx > 0) {
-			if(topRight || bottomRight) {
+			if ((topRight || bottomRight) || (topRight && bottomRight)) {
 				dx = 0;
 				xTemp = (currCol + 1) * tileSize - cWidth / 2;
-			}
-			else {
+				sticking = true;
+			} else {
 				xTemp += dx;
+				sticking = false;
 			}
 		}
-		
+
 		if(!falling) {
 			calculateCorners(posX, yDest + 1);
-			if(!bottomLeft && !bottomRight) {
-				falling = true;
-			}
+			if(!bottomLeft && !bottomRight) falling = true;
 		}
 		
 	}
@@ -185,11 +201,13 @@ public abstract class MapObject {
 		yMap = tileMap.getPosY();
 	}
 	
-	public void setLeft(boolean b) { left = b; }
-	public void setRight(boolean b) { right = b; }
-	public void setUp(boolean b) { up = b; }
-	public void setDown(boolean b) { down = b; }
-	public void setJumping(boolean b) { jumping = b; }
+	public void setLeft (boolean b) { left = b; }
+	public void setRight (boolean b) { right = b; }
+	public void setUp (boolean b) { up = b; }
+	public void setDown (boolean b) { down = b; }
+	public void setJumping (boolean b) { jumping = b; }
+	public void setFalling (boolean b) { falling = b; }
+	public void setSticking (boolean b) { sticking = b; }
 	
 	public boolean notOnScreen() {
 		return posX + xMap + width < 0 ||
@@ -197,7 +215,8 @@ public abstract class MapObject {
 			posY + yMap + height < 0 ||
 			posY + yMap - height > GamePanel.HEIGHT;
 	}
-	
+
+
 }
 
 

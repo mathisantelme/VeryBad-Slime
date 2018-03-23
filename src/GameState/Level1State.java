@@ -23,7 +23,7 @@ public class Level1State extends GameState {
 
     @Override
     public void init () {
-        tileMap = new TileMap(30);
+        tileMap = new TileMap(32    );
         tileMap.loadTiles("/Tilesets/sprite_glace.gif");
         tileMap.loadMap("/Maps/level1-2.map");
         tileMap.setPosition(0, 0);
@@ -68,6 +68,12 @@ public class Level1State extends GameState {
             case KeyEvent.VK_D:
                 player.setRight(true);
                 break;
+            case KeyEvent.VK_LEFT:
+                player.setLeft(true);
+                break;
+            case KeyEvent.VK_RIGHT:
+                player.setRight(true);
+                break;
             case KeyEvent.VK_Z:
                 player.setUp(true);
                 break;
@@ -76,9 +82,6 @@ public class Level1State extends GameState {
                 break;
             case KeyEvent.VK_SPACE:
                 player.setJumping(true);
-                break;
-            case KeyEvent.VK_A:
-                player.setSticking(true);
                 break;
             case KeyEvent.VK_ESCAPE:
                 exit(0);
@@ -95,6 +98,12 @@ public class Level1State extends GameState {
             case KeyEvent.VK_D:
                 player.setRight(false);
                 break;
+            case KeyEvent.VK_LEFT:
+                player.setLeft(false);
+                break;
+            case KeyEvent.VK_RIGHT:
+                player.setRight(false);
+                break;
             case KeyEvent.VK_Z:
                 player.setUp(false);
                 break;
@@ -103,9 +112,6 @@ public class Level1State extends GameState {
                 break;
             case KeyEvent.VK_SPACE:
                 player.setJumping(false);
-                break;
-            case KeyEvent.VK_A:
-                player.setSticking(false);
                 break;
         }
     }
