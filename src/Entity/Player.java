@@ -1,5 +1,6 @@
 package Entity;
 
+import Entity.Ennemies.Ennemy;
 import Main.TileMap.TileMap;
 
 import javax.imageio.ImageIO;
@@ -15,16 +16,19 @@ public class Player extends MapObject {
     private boolean flinching;
     private long flinchTimer;
 
+    // sticking to wall
+    private boolean sticking;
+
     // attacks - slime
     private boolean firing;
     private int slimeAttackCost;
     private int slimeAttackDmg;
-    //private ArrayList<SlimeBalls> slimeBalls;
+    private ArrayList<SlimeBall> slimeBalls;
 
     // attacks - slime
-    private boolean scratching;
+    /*private boolean scratching;
     private int scratchDmg;
-    private int scratchRange;
+    private int scratchRange;*/
 
     // animations
     private ArrayList<BufferedImage[]> sprites;
@@ -36,9 +40,9 @@ public class Player extends MapObject {
     private static final int WALKING = 1;
     private static final int JUMPING = 2;
     private static final int FALLING = 3;
-    private static final int SLIMEATTACK = 4;
-    private static final int SCRATCHING = 5;
-    private static final int STICKING = 6;
+    private static final int SLIMEATTACK = 0; //temp value change it to 4
+    private static final int STICKING = 5;
+
 
     //====== Constructor ======//
     public Player (TileMap tm) {
@@ -60,14 +64,14 @@ public class Player extends MapObject {
         facingRight = true;
 
         health = maxHealth = 5;
-        slime = maxSlime = 2500;
+        slime = maxSlime = 25;
 
-        slimeAttackCost = 200;
+        slimeAttackCost = 2;
         slimeAttackDmg = 5;
-        // slimeBalls = new ArrayList<SlimeBall>();
+        slimeBalls = new ArrayList<SlimeBall>();
 
-        scratchDmg = 8;
-        scratchRange = 40; // in pixels
+        /*scratchDmg = 8;
+        scratchRange = 40; // in pixels*/
 
         // loading sprites
         sprites = new ArrayList<BufferedImage[]>();
@@ -113,14 +117,14 @@ public class Player extends MapObject {
         animation.setDelay(50);
     }
 
-    public int getHealth () { return health; }
-    public int getMaxHealth () { return maxHealth; }
-    public int getSlime () { return slime; }
-    public int getMaxSlime () { return maxSlime; }
+    int getHealth() { return health; }
+    int getMaxHealth() { return maxHealth; }
+    public boolean isDead () { return dead; }
+    int getSlime() { return slime; }
+    int getMaxSlime() { return maxSlime; }
+    boolean isSticking () { return sticking; }
 
     public void setFiring () { firing = true; }
-    public void setScratching () { scratching = true; }
-    public void setSticking (boolean sticking) { this.sticking = sticking; }
 
     // methods
     /**
@@ -129,10 +133,13 @@ public class Player extends MapObject {
     private void getNextPosition () {
         // deplacement a gauche
         if (left) {
+            sticking = (bottomLeft && topLeft);
             dx -= moveSpeed;
             if (dx < -maxSpeed) dx = -maxSpeed;
-        } // deplacement a droite
-        else if (right) {
+        } else
+        // deplacement a droite
+        if (right) {
+            sticking = (bottomRight && topRight);
             dx += moveSpeed;
             if (dx > maxSpeed) dx = maxSpeed;
         } // arret du personnage
@@ -146,23 +153,29 @@ public class Player extends MapObject {
             }
         }
 
-        // cannot move while attacking except in air
-        if ((currentAction == SCRATCHING || currentAction == SLIMEATTACK) && !(jumping || falling)) dx = 0;
-
         // jumping
-        if (jumping && !falling) {
+        if (jumping && !falling && !sticking) {
             dy = jumpStart;
             falling = true;
         }
 
         // falling
         if (falling) {
-            dy += fallSpeed;
+            if (sticking){
+                System.out.println("sticking");
+                dy =+ fallSpeed * 0.9;
+            } else dy += fallSpeed;
 
-            if (dy > 0) jumping = false; // si le joueur tombe il ne peut plus sauter
+            if (dy > 0) {
+                jumping = false;
+                // si le joueur tombe il ne peut plus sauter
+            }
             if (dy < 0 && !jumping) dy += stopJumpSpeed; // retour au sol si le joueur ne saute plus
             if (dy > maxFallSpeed) dy = maxFallSpeed; // on cap la vitesse de saut
         }
+
+        // cannot move while attacking except in air
+        if ((currentAction == SLIMEATTACK) && !(jumping || falling)) dx = 0;
     }
 
     /**
@@ -174,19 +187,46 @@ public class Player extends MapObject {
         checkTileMapCollision();
         setPosition(xTemp, yTemp);
 
-        // set animations
-        if (scratching) { // gestion de l'attaque corps a corps
-            if (currentAction != SCRATCHING) {
-                currentAction = SCRATCHING;
-                animation.setFrames(sprites.get(SCRATCHING));
-                animation.setDelay(50);
-                width = 60;
+        // check attacK has sTopped
+        if (currentAction == SLIMEATTACK) {
+            if (animation.hasPlayedOnce()) firing = false;
+        }
+
+        // slimeballs ===================================================================
+        slime += 1;
+        if (slime > maxSlime) slime = maxSlime;
+
+        if (firing && currentAction != SLIMEATTACK) {
+            if (slime > slimeAttackCost) {
+                slime -= slimeAttackCost;
+                SlimeBall sb = new SlimeBall(tileMap, facingRight);
+                sb.setPosition(posX, posY);
+                slimeBalls.add(sb);
             }
-        } else if (firing) { // gestion de l'attaque a distance
+        }
+
+        for (int i = 0; i < slimeBalls.size(); i++) {
+            slimeBalls.get(i).update();
+            if (slimeBalls.get(i).shouldRemove()) {
+                slimeBalls.remove(i);
+                i--;
+            }
+        }
+
+        // check done flinching ===================================================================
+        if (flinching) {
+            long elapsed = (System.nanoTime() - flinchTimer) / 1000000;
+            if (elapsed > 1000) {
+                flinching = false;
+            }
+        }
+
+        // set animation ===================================================================
+        if (firing) { // gestion de l'attaque a distance
             if (currentAction != SLIMEATTACK) {
                 currentAction = SLIMEATTACK;
                 animation.setFrames(sprites.get(SLIMEATTACK));
-                animation.setDelay(100);
+                animation.setDelay(10);
                 width = 30;
             }
         } else if (dy > 0) { // gestion de la chute
@@ -222,7 +262,7 @@ public class Player extends MapObject {
         animation.update();
 
         // set the direction
-        if (currentAction != SCRATCHING && currentAction != SLIMEATTACK) {
+        if (currentAction != SLIMEATTACK) {
             if (right) facingRight = true;
             if (left) facingRight = false;
         }
@@ -241,22 +281,35 @@ public class Player extends MapObject {
             if (elapsed / 100 % 2 == 0) return;
         }
 
-        if (facingRight) { // si le personnage regarde a droite alors on dessine l'animation dans le bon sens
-            g.drawImage(
-                    animation.getImage(),
-                    (int) (posX + xMap - width / 2),
-                    (int) (posY + yMap - height / 2),
-                    null
-            );
-        } else { // sinon on la retourne
-            g.drawImage(
-                    animation.getImage(),
-                    (int) (posX + xMap - width / 2 + width),
-                    (int) (posY + yMap - height / 2),
-                    -width,
-                    height,
-                    null
-            );
+        // draw slimeball
+        for (SlimeBall s: slimeBalls) {
+            s.draw(g);
         }
+
+        super.draw(g);
+    }
+
+    public void checkAttack(ArrayList<Ennemy> ennemies) {
+        for (Ennemy e: ennemies) {
+            for (SlimeBall s: slimeBalls) {
+                if (s.intersects(e)) {
+                    e.hit(slimeAttackDmg);
+                    s.setHit();
+                    break;
+                }
+            }
+
+            // check ennemies collison
+            if (intersects(e)) this.hit(e.getDamage());
+        }
+    }
+
+    private void hit(int dmg) {
+        if (flinching) return;
+        health -= dmg;
+        if (health < 0) health = 0;
+        if (health == 0) dead = true;
+        flinching = true;
+        flinchTimer = System.nanoTime();
     }
 }

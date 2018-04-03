@@ -5,6 +5,7 @@ import java.util.ArrayList;
 public class GameStateManager {
     public static final int MENU = 0;
     public static final int LEVEL_01 = 1;
+    public static final int DEATHSCREEN = 2;
 
     private ArrayList<GameState> gameStates;
     private int currentState;
@@ -14,6 +15,7 @@ public class GameStateManager {
         currentState = MENU;
         gameStates.add(new MenuState(this));
         gameStates.add(new Level1State(this));
+        gameStates.add(new DeathScreen(this));
     }
 
     // methods

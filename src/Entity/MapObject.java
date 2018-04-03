@@ -53,7 +53,6 @@ public abstract class MapObject {
 	protected boolean down;
 	protected boolean jumping;
 	protected boolean falling;
-	protected boolean sticking;
 	
 	// movement attributes
 	protected double moveSpeed;
@@ -86,9 +85,9 @@ public abstract class MapObject {
 	}
 
 	/**
-	 * permet de verifier les collisons d'un rectangle
-	 * @param x
-	 * @param y
+	 * permet de verifier les collisons d'un rectangle avec une tile
+	 * @param x position x de la tile
+	 * @param y	position y de la tile
 	 */
 	public void calculateCorners(double x, double y) {
 		
@@ -140,36 +139,28 @@ public abstract class MapObject {
 				yTemp = (currRow + 1) * tileSize - cHeight / 2;
 			}
 			else {
-				if (sticking && !jumping) {
-					yTemp += dy * 0.1;
-					System.out.println(dy);
-				}
-				else yTemp += dy;
+				yTemp += dy;
 			}
 		}
 		
 		calculateCorners(xDest, posY);
 		// left
 		if(dx < 0) {
-			if((topLeft || bottomLeft) || (topLeft && bottomLeft)) {
+			if((topLeft || bottomLeft)) {
 				dx = 0;
 				xTemp = currCol * tileSize + cWidth / 2;
-				sticking = true;
 			} else {
 				xTemp += dx;
-				sticking = false;
 			}
 		}
 
 		// right
 		if(dx > 0) {
-			if ((topRight || bottomRight) || (topRight && bottomRight)) {
+			if ((topRight || bottomRight)) {
 				dx = 0;
 				xTemp = (currCol + 1) * tileSize - cWidth / 2;
-				sticking = true;
 			} else {
 				xTemp += dx;
-				sticking = false;
 			}
 		}
 
@@ -195,8 +186,8 @@ public abstract class MapObject {
 		this.dx = dx;
 		this.dy = dy;
 	}
-	
-	public void setMapPosition() {
+
+	protected void setMapPosition() {
 		xMap = tileMap.getPosX();
 		yMap = tileMap.getPosY();
 	}
@@ -207,8 +198,11 @@ public abstract class MapObject {
 	public void setDown (boolean b) { down = b; }
 	public void setJumping (boolean b) { jumping = b; }
 	public void setFalling (boolean b) { falling = b; }
-	public void setSticking (boolean b) { sticking = b; }
-	
+
+	/**
+	 * permet de savoir si un objet est affichable a l'écran
+	 * @return si l'objet est compris dans l'écran
+	 */
 	public boolean notOnScreen() {
 		return posX + xMap + width < 0 ||
 			posX + xMap - width > GamePanel.WIDTH ||
@@ -216,7 +210,29 @@ public abstract class MapObject {
 			posY + yMap - height > GamePanel.HEIGHT;
 	}
 
-
+	/**
+	 * permet de dessiner a l'écran les objet de la map
+	 * @param g
+	 */
+	public void  draw (Graphics2D g) {
+		if (facingRight) {
+			g.drawImage(
+					animation.getImage(),
+					(int) (posX + xMap - width / 2),
+					(int) (posY + yMap - height / 2),
+					null
+			);
+		} else {
+			g.drawImage(
+					animation.getImage(),
+					(int) (posX + xMap - width / 2 + width),
+					(int) (posY + yMap - height / 2),
+					-width,
+					height,
+					null
+			);
+		}
+	}
 }
 
 

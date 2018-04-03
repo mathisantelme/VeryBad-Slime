@@ -1,9 +1,3 @@
-/**
- * ====== GameState ======
- *
- * Une classe abstraite qui sers de schemas qui va servir dans la création des differents ecran du jeu (menu, level1, level2, etc...)
- */
-
 package GameState;
 
 public abstract class GameState {
