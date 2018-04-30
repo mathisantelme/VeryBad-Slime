@@ -113,7 +113,6 @@ public abstract class MapObject {
 				bottomRight = br == Tile.BLOCKED;
 			} catch (java.lang.ArrayIndexOutOfBoundsException e) {
 				this.outOfTheWorld = true;
-				System.out.println("out of the world");
 			}
 		}
 		

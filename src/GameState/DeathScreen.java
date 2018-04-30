@@ -20,8 +20,8 @@ public class DeathScreen extends GameState {
     private Font titleFont;
     private Font font;
 
-    public DeathScreen (GameStateManager p_GSM) {
-        this.GSM = p_GSM;
+    public DeathScreen (GameStateManager gsm) {
+        this.GSM = gsm;
         init();
     }
 

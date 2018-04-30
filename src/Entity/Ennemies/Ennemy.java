@@ -22,7 +22,7 @@ public abstract class Ennemy extends MapObject {
     public int getDamage () { return damage; }
 
     public void hit (int dmg) {
-        if (dead || flinching || outOfTheWorld) return;
+        if (dead || flinching) return;
         health -= dmg;
         if (health < 0) health = 0;
         if (health == 0) dead = true;

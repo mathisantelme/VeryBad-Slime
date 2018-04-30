@@ -17,7 +17,7 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
     private static int TILESIZE = 30;
     private static final int numRows = 2;
 
-    private String path = "Resources/Tilesets/grass_world.gif";
+    private String path = "Resources/Tilesets/grass_world.png";
     private BufferedImage tileset;
     private BufferedImage[][] tiles;
     private int numTiles;

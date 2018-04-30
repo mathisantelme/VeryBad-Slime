@@ -7,11 +7,11 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
-public class Knight extends Ennemy {
+public class Snake extends Ennemy {
 
     private BufferedImage[] sprites;
 
-    public Knight (TileMap tm) {
+    public Snake(TileMap tm) {
         super(tm);
 
         moveSpeed = 0.5;
@@ -19,8 +19,9 @@ public class Knight extends Ennemy {
         fallSpeed = 0.2;
         maxFallSpeed = 10.0;
 
-        width = height = 30;
-        cWidth = cHeight = 20;
+        width = height = 32;
+        cWidth = 20;
+        cHeight = 15;
 
         health = maxHealth = 2;
         damage = 1;
@@ -29,7 +30,7 @@ public class Knight extends Ennemy {
         try {
             BufferedImage spritesheet = ImageIO.read(
                     getClass().getResourceAsStream(
-                            "/Sprites/Player/perso_anim.gif"
+                            "/Sprites/Enemies/sprite_enemi.png"
                     )
             );
 
@@ -72,32 +73,34 @@ public class Knight extends Ennemy {
     }
 
     public void update () {
-        // updating position
-        getNextPosition();
-        checkTileMapCollision();
-        setPosition(xTemp, yTemp);
+        if (!notOnScreen()) {
+            // updating position
+            getNextPosition();
+            checkTileMapCollision();
+            setPosition(xTemp, yTemp);
 
-        // check fliching
-        if (flinching) {
-            long elapsed = (System.nanoTime() - flinchTimer) / 1000000;
-            if (elapsed > 400) {
-                flinching = false;
+            // check fliching
+            if (flinching) {
+                long elapsed = (System.nanoTime() - flinchTimer) / 1000000;
+                if (elapsed > 400) {
+                    flinching = false;
+                }
             }
-        }
 
-        // wall check
-        if (right && dx == 0) {
-            right = false;
-            left = true;
-            facingRight = false;
-        } else if (left && dx == 0) {
-            right = true;
-            left = false;
-            facingRight = true;
-        }
+            // wall check
+            if (right && dx == 0) {
+                right = false;
+                left = true;
+                facingRight = false;
+            } else if (left && dx == 0) {
+                right = true;
+                left = false;
+                facingRight = true;
+            }
 
-        // update animation
-        animation.update();
+            // update animation
+            animation.update();
+        }
     }
 
     public void draw (Graphics2D g) {

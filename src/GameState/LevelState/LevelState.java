@@ -1,7 +1,7 @@
 package GameState.LevelState;
 
 import Entity.Ennemies.Ennemy;
-import Entity.Ennemies.Knight;
+import Entity.Ennemies.Snake;
 import Entity.Explosion;
 import Entity.HUD;
 import Entity.Player;
@@ -17,6 +17,9 @@ import java.util.ArrayList;
 import static java.lang.System.exit;
 
 public class LevelState extends GameState {
+
+    public static final int[] levels = {1, 2, 3};
+    public static int currentLevel;
 
     protected TileMap tileMap;
     protected Background bg;
@@ -91,7 +94,22 @@ public class LevelState extends GameState {
     public void update() {
         // updates the player
         player.update();
-        if (player.getCurrCol() == endPos[0] && player.getCurrRow() == endPos[1]) GSM.setState(GameStateManager.MENU);
+        if (player.getCurrCol() == endPos[0] && player.getCurrRow() == endPos[1]) {
+            switch (currentLevel) {
+                case 1:
+                    GSM.setState(GameStateManager.LEVEL_02);
+                    currentLevel++;
+                    break;
+                case 2:
+                    GSM.setState(GameStateManager.LEVEL_03);
+                    currentLevel++;
+                    break;
+                case 3:
+                    GSM.setState(GameStateManager.MENU);
+                    currentLevel = 1;
+                    break;
+            }
+        }
 
         tileMap.setPosition(
                 GamePanel.WIDTH / 2 - player.getPosX(),
@@ -105,7 +123,6 @@ public class LevelState extends GameState {
         for (int i = 0; i < ennemies.size(); i++) {
             ennemies.get(i).update();
             if (ennemies.get(i).isDead()) {
-                System.out.println(ennemies.get(i).getPosX() + " " + ennemies.get(i).getPosY());
                 explosions.add(new Explosion(ennemies.get(i).getPosX(), ennemies.get(i).getPosY()));
                 ennemies.remove(i);
                 i--;
@@ -126,13 +143,15 @@ public class LevelState extends GameState {
         }
 
         /// check if player is alive
-        if (player.isDead()) GSM.setState(GameStateManager.DEATHSCREEN);
+        if (player.isDead()) {
+            GSM.setState(GameStateManager.DEATHSCREEN);
+        }
     }
 
     public void populateLevel (int[][] positions) {
         ennemies = new ArrayList<Ennemy>();
         for (int i = 0; i < positions.length; i++) {
-            ennemies.add(new Knight(tileMap));
+            ennemies.add(new Snake(tileMap));
             ennemies.get(i).setPosition(positions[i][0], positions[i][1]);
         }
     }
@@ -181,6 +200,9 @@ public class LevelState extends GameState {
                 break;
             case KeyEvent.VK_A:
                 player.setFiring();
+                break;
+            case KeyEvent.VK_P:
+                System.out.print(player.getPosX() + " : " + player.getPosY());
                 break;
             case KeyEvent.VK_ESCAPE:
                 exit(0);

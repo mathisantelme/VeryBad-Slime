@@ -1,20 +1,22 @@
 package GameState;
 
 import GameState.Editor.Editor;
-import GameState.LevelState.Level1State;
+import GameState.LevelState.*;
 
 import java.util.ArrayList;
 
 public class GameStateManager {
     // attributs du game state manager
-    private int GAME_STATE_NBR = 5;
+    private int GAME_STATE_NBR = 6;
     private GameState[] gameStates;
     private int currentState;
 
     public static final int MENU = 0;
     public static final int EDITOR = 1;
     public static final int LEVEL_01 = 2;
-    public static final int DEATHSCREEN = 3;
+    public static final int LEVEL_02 = 3;
+    public static final int LEVEL_03 = 4;
+    public static final int DEATHSCREEN = 5;
 
     // les differents levels present dans le jeu
     public static ArrayList<GameState> levels = new ArrayList<GameState>();
@@ -31,7 +33,13 @@ public class GameStateManager {
                 gameStates[state] = new MenuState(this);
                 break;
             case LEVEL_01:
-                gameStates[state] = new Level1State(this);
+                gameStates[state] = new Level1(this);
+                break;
+            case LEVEL_02:
+                gameStates[state] = new Level2(this);
+                break;
+            case LEVEL_03:
+                gameStates[state] = new Level3(this);
                 break;
             case EDITOR:
                 gameStates[state] = new Editor(this);
