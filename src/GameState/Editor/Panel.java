@@ -11,11 +11,11 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
 
     private static final String DEFAULT_SAVE_PATH = "Resources/Maps/playerMaps/";
 
-    public static final int WIDTH = 640;
-    public static final int HEIGHT = 480;
-    public static final int SCALE = 1;
-    public static int TILESIZE = 30;
-    public static final int numRows = 2;
+    private static final int WIDTH = 640;
+    private static final int HEIGHT = 480;
+    private static final int SCALE = 1;
+    private static int TILESIZE = 30;
+    private static final int numRows = 2;
 
     private String path = "Resources/Tilesets/grass_world.gif";
     private BufferedImage tileset;

@@ -1,7 +1,5 @@
 package GameState;
 
-import GameState.Editor.Editor;
-import Main.Game;
 import Main.GamePanel;
 import Main.TileMap.Background;
 
@@ -43,11 +41,9 @@ public class MenuState extends GameState {
     private void select () {
         switch (currentChoice) {
             case 0:
-                System.out.println("Starting the game !");
                 GSM.setState(GameStateManager.LEVEL_01);
                 break;
             case 1:
-                System.out.println("Level Selector");
                 break;
             case 2:
                 GSM.setState(GameStateManager.EDITOR);

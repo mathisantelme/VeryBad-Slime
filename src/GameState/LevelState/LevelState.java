@@ -16,7 +16,7 @@ import java.util.ArrayList;
 
 import static java.lang.System.exit;
 
-abstract class LevelState extends GameState {
+public class LevelState extends GameState {
 
     protected TileMap tileMap;
     protected Background bg;
@@ -26,6 +26,11 @@ abstract class LevelState extends GameState {
 
     protected ArrayList<Ennemy> ennemies;
     protected ArrayList<Explosion> explosions;
+    //===============================================
+
+    public LevelState (GameStateManager p_GSM) {
+        this.GSM = p_GSM;
+    }
 
     //===============================================
     // methods
@@ -37,7 +42,7 @@ abstract class LevelState extends GameState {
             String pathToMap, String pathToTileSet, int tileSize,
             String pathToBackground, double moveScale,
             int[][] ennemiesPositions,
-            double[] levelPos
+            double[] playerPos, double[] endPos
     ) {
         // initialisation de tileMap
         tileMap = new TileMap(tileSize);
@@ -64,7 +69,7 @@ abstract class LevelState extends GameState {
 
         // on initialise les composant liés au joueur
         player = new Player(tileMap);
-        player.setPosition(100, 100);
+        player.setPosition(playerPos[0], playerPos[1]);
         //hud = new HUD(player);
 
         // on charge l'array d'explosion lié aux mort des ennemis

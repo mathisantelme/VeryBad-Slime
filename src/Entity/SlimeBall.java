@@ -23,7 +23,7 @@ public class SlimeBall extends MapObject {
         else dx = -moveSpeed;
 
         width = height = 32;
-        cWidth = cHeight = 32;
+        cWidth = cHeight = 10;
         spritesLength = 4;
         hitspriteLength = 3;
 

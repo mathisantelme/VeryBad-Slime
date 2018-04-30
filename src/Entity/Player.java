@@ -51,7 +51,7 @@ public class Player extends MapObject {
         width = 32;
         height = 32;
         cWidth = 15;
-        cHeight = 20;
+        cHeight = 25;
 
         moveSpeed = 0.3;
         maxSpeed = 1.6;
@@ -149,10 +149,10 @@ public class Player extends MapObject {
 
         // falling
         if (falling) {
-            if (sticking){
+            /*if (sticking){
                 System.out.println("sticking");
                 dy =+ fallSpeed * 0.9;
-            } else dy += fallSpeed;
+            } else*/ dy += fallSpeed;
 
             if (dy > 0) {
                 jumping = false;
