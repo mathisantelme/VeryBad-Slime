@@ -1,5 +1,8 @@
 package GameState;
 
+import GameState.Editor.Editor;
+import Main.Game;
+import Main.GamePanel;
 import Main.TileMap.Background;
 
 import java.awt.*;
@@ -9,9 +12,11 @@ public class MenuState extends GameState {
 
     private Background bg;
     private int currentChoice = 0;
+    private String title = "VeryBad Slime";
     private String[] options = {
         "Start",
-        "Help",
+        "Level Selector",
+        "Editor",
         "Quit"
     };
 
@@ -42,9 +47,12 @@ public class MenuState extends GameState {
                 GSM.setState(GameStateManager.LEVEL_01);
                 break;
             case 1:
-                System.out.println("Help page");
+                System.out.println("Level Selector");
                 break;
             case 2:
+                GSM.setState(GameStateManager.EDITOR);
+                break;
+            case 3:
                 System.exit(0);
                 break;
         }
@@ -65,16 +73,16 @@ public class MenuState extends GameState {
         // draw title
         g.setColor(titleColor);
         g.setFont(titleFont);
-        g.drawString("VeryBad Slime", 60, 70); // faire une fonction qui centre une chaine de caractere d'une taille donnée
+        g.drawString(title, (GamePanel.WIDTH - g.getFontMetrics().stringWidth(title)) / 2, 70);
 
         // draw options
         g.setFont(font);
 
         for (int i = 0; i < options.length; i++) {
-            if (i == currentChoice) g.setColor(Color.BLACK);
+            if (i == currentChoice) g.setColor(Color.DARK_GRAY);
             else g.setColor(Color.RED);
 
-            g.drawString(options[i], 145, 140 + i * 15);
+            g.drawString(options[i], (GamePanel.WIDTH - g.getFontMetrics().stringWidth(options[i])) / 2, 140 + i * 15);
         }
     }
 
@@ -94,7 +102,5 @@ public class MenuState extends GameState {
     }
 
     @Override
-    public void keyReleased(int k) {
-
-    }
+    public void keyReleased (int k) {}
 }

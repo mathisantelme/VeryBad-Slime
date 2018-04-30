@@ -11,7 +11,7 @@ public class Knight extends Ennemy {
 
     private BufferedImage[] sprites;
 
-    public Knight(TileMap tm) {
+    public Knight (TileMap tm) {
         super(tm);
 
         moveSpeed = 0.5;

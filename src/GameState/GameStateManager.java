@@ -1,43 +1,75 @@
 package GameState;
 
+import GameState.Editor.Editor;
+import GameState.LevelState.Level1State;
+
 import java.util.ArrayList;
 
 public class GameStateManager {
-    public static final int MENU = 0;
-    public static final int LEVEL_01 = 1;
-    public static final int DEATHSCREEN = 2;
-
-    private ArrayList<GameState> gameStates;
+    // attributs du game state manager
+    private int GAME_STATE_NBR = 5;
+    private GameState[] gameStates;
     private int currentState;
 
+    public static final int MENU = 0;
+    public static final int EDITOR = 1;
+    public static final int LEVEL_SELECTOR = 2;
+    public static final int LEVEL_01 = 3;
+    public static final int DEATHSCREEN = 4;
+
+    // les differents levels present dans le jeu
+    public static ArrayList<GameState> levels = new ArrayList<GameState>();
+
     public GameStateManager () {
-        gameStates = new ArrayList<GameState>();
+        gameStates = new GameState[GAME_STATE_NBR];
         currentState = MENU;
-        gameStates.add(new MenuState(this));
-        gameStates.add(new Level1State(this));
-        gameStates.add(new DeathScreen(this));
+        loadState(currentState);
     }
 
-    // methods
+    public void loadState (int state) {
+        switch (state) {
+            case MENU:
+                gameStates[state] = new MenuState(this);
+                break;
+            case LEVEL_01:
+                gameStates[state] = new Level1State(this);
+                break;
+            case EDITOR:
+                gameStates[state] = new Editor(this);
+                break;
+            case DEATHSCREEN:
+                gameStates[state] = new DeathScreen(this);
+                break;
+        }
+    }
+
+    public void unloadState (int state) {
+        gameStates[state] = null;
+    }
 
     public void setState (int state) {
+        unloadState(state);
         currentState = state;
-        gameStates.get(currentState).init();
+        loadState(currentState);
     }
 
     public void update () {
-        gameStates.get(currentState).update();
+        try {
+            gameStates[currentState].update();
+        } catch(Exception e) {}
     }
 
     public void draw (java.awt.Graphics2D g) {
-        gameStates.get(currentState).draw(g);
+        try {
+            gameStates[currentState].draw(g);
+        } catch (Exception e) {}
     }
 
     public void keyPressed (int k) {
-        gameStates.get(currentState).keyPressed(k);
+        gameStates[currentState].keyPressed(k);
     }
 
     public void keyReleased (int k) {
-        gameStates.get(currentState).keyReleased(k);
+        gameStates[currentState].keyReleased(k);
     }
 }

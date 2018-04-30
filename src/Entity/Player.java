@@ -32,24 +32,24 @@ public class Player extends MapObject {
 
     // animations
     private ArrayList<BufferedImage[]> sprites;
-    // array that stores the number of frames per animations
-    private final int[] framesAmount = { 7, 7, 5, 1 };
 
-    // animations actions
+    // array that stores the number of frames per animations
+    private static final int nbrAnim = 5;
+    private final int[] framesAmount = { 7, 7, 5, 1, 3};
     private static final int IDLE = 0;
     private static final int WALKING = 1;
     private static final int JUMPING = 2;
     private static final int FALLING = 3;
-    private static final int SLIMEATTACK = 0; //temp value change it to 4
-    private static final int STICKING = 5;
+    private static final int SLIMEATTACK = 4; //temp value change it to 4
+    // private static final int STICKING = 5;
 
 
     //====== Constructor ======//
     public Player (TileMap tm) {
         super(tm);
 
-        width = 30;
-        height = 30;
+        width = 32;
+        height = 32;
         cWidth = 15;
         cHeight = 20;
 
@@ -77,32 +77,19 @@ public class Player extends MapObject {
         sprites = new ArrayList<BufferedImage[]>();
         try {
             BufferedImage spritesheet = ImageIO.read(
-                getClass().getResourceAsStream("/Sprites/Player/perso_anim.gif")
+                getClass().getResourceAsStream("/Sprites/Player/perso_animm.png")
             );
 
-            for (int i = 0; i < 4; i++) {
+            for (int i = 0; i < nbrAnim; i++) {
                 BufferedImage[] bi = new BufferedImage[framesAmount[i]];
-
-                if (i != 6) {
-                    for (int j = 0; j < framesAmount[i]; j++) {
-                        bi[j] = spritesheet.getSubimage(
-                                j * width,
-                                i * height,
-                                width,
-                                height
-                        );
-                    }
-                } else {
-                    for (int j = 0; j < framesAmount[i]; j++) {
-                        bi[j] = spritesheet.getSubimage(
-                                j * width * 2,
-                                i * height,
-                                width * 2,
-                                height
-                        );
-                    }
+                for (int j = 0; j < framesAmount[i]; j++) {
+                    bi[j] = spritesheet.getSubimage(
+                            j * width,
+                            i * height,
+                            width,
+                            height
+                    );
                 }
-
                 sprites.add(bi);
             }
 
@@ -119,12 +106,13 @@ public class Player extends MapObject {
 
     int getHealth() { return health; }
     int getMaxHealth() { return maxHealth; }
-    public boolean isDead () { return dead; }
+    // return if the player is dead or out of the world
+    public boolean isDead () { return dead || outOfTheWorld; }
     int getSlime() { return slime; }
     int getMaxSlime() { return maxSlime; }
     boolean isSticking () { return sticking; }
 
-    public void setFiring () { firing = true; }
+    public void setFiring () { /*if (!falling)*/ firing = true; }
 
     // methods
     /**
@@ -226,36 +214,31 @@ public class Player extends MapObject {
             if (currentAction != SLIMEATTACK) {
                 currentAction = SLIMEATTACK;
                 animation.setFrames(sprites.get(SLIMEATTACK));
-                animation.setDelay(10);
-                width = 30;
+                animation.setDelay(30);
             }
         } else if (dy > 0) { // gestion de la chute
             if (currentAction != FALLING) {
                 currentAction = FALLING;
                 animation.setFrames(sprites.get(FALLING));
                 animation.setDelay(-1);
-                width = 30;
             }
         } else if (dy < 0) { // gestion du saut
             if (currentAction != JUMPING) {
                 currentAction = JUMPING;
                 animation.setFrames(sprites.get(JUMPING));
-                animation.setDelay(50); // si il n'posY a pas besoin d'animation mettre le delay sur -1 (cf Entity.Animation)
-                width = 30;
+                animation.setDelay(50); // si il n'a pas besoin d'animation mettre le delay sur -1 (cf Entity.Animation)
             }
         } else if (left || right) {
             if (currentAction != WALKING) {
                 currentAction = WALKING;
                 animation.setFrames(sprites.get(WALKING));
                 animation.setDelay(40);
-                width = 30;
             }
         } else {
             if (currentAction != IDLE) {
                 currentAction = IDLE;
                 animation.setFrames(sprites.get(IDLE));
                 animation.setDelay(50);
-                width = 30;
             }
         }
 
@@ -289,7 +272,7 @@ public class Player extends MapObject {
         super.draw(g);
     }
 
-    public void checkAttack(ArrayList<Ennemy> ennemies) {
+    public void checkAttack (ArrayList<Ennemy> ennemies) {
         for (Ennemy e: ennemies) {
             for (SlimeBall s: slimeBalls) {
                 if (s.intersects(e)) {

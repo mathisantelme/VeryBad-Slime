@@ -22,8 +22,8 @@ public class SlimeBall extends MapObject {
         if (right) dx = moveSpeed;
         else dx = -moveSpeed;
 
-        width = height = 25;
-        cWidth = cHeight = 15;
+        width = height = 32;
+        cWidth = cHeight = 32;
         spritesLength = 4;
         hitspriteLength = 3;
 
@@ -31,7 +31,7 @@ public class SlimeBall extends MapObject {
         try {
             BufferedImage spritesheet = ImageIO.read(
                 getClass().getResourceAsStream(
-                    "/Sprites/Player/fireball.gif"
+                    "/Sprites/Player/projectile.png"
                 )
             );
 

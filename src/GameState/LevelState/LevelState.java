@@ -1,10 +1,12 @@
-package GameState;
-
-
+package GameState.LevelState;
 
 import Entity.Ennemies.Ennemy;
-import Entity.*;
 import Entity.Ennemies.Knight;
+import Entity.Explosion;
+import Entity.HUD;
+import Entity.Player;
+import GameState.GameState;
+import GameState.GameStateManager;
 import Main.GamePanel;
 import Main.TileMap.Background;
 import Main.TileMap.TileMap;
@@ -14,53 +16,71 @@ import java.util.ArrayList;
 
 import static java.lang.System.exit;
 
-public class Level1State extends GameState {
-    private TileMap tileMap;
-    private Background bg;
+abstract class LevelState extends GameState {
 
-    private Player player;
-    private HUD hud;
+    protected TileMap tileMap;
+    protected Background bg;
 
-    private ArrayList<Ennemy> ennemies;
-    private ArrayList<Explosion> explosions;
+    protected Player player;
+    protected HUD hud;
 
-    Level1State(GameStateManager p_GSM) {
-        this.GSM = p_GSM;
-        init();
-    }
+    protected ArrayList<Ennemy> ennemies;
+    protected ArrayList<Explosion> explosions;
 
+    //===============================================
+    // methods
     @Override
-    public void init () {
-        tileMap = new TileMap(32    );
-        tileMap.loadTiles("/Tilesets/sprite_glace.gif");
-        tileMap.loadMap("/Maps/level1-2.map");
+    public void init() {}
+
+    // surcharge de la methode init() de GameState afin de charger les differents fichiers liés aux niveaux
+    public void init(
+            String pathToMap, String pathToTileSet, int tileSize,
+            String pathToBackground, double moveScale,
+            int[][] ennemiesPositions,
+            double[] levelPos
+    ) {
+        // initialisation de tileMap
+        tileMap = new TileMap(tileSize);
+
+        // on charge le fichier .map
+        try {
+            tileMap.loadMap(pathToMap);
+        } catch (java.lang.IllegalArgumentException e) {
+            // si le fichier .map n'est pas valide ou introuvable on redirige l'utilisateur vers le selecteur de niveau
+            System.out.print("The specified path isn't valid please specify valid path for a .map file");
+            this.GSM.setState(GameStateManager.LEVEL_SELECTOR);
+        }
+
+        try {
+            tileMap.loadTiles(pathToTileSet);
+        } catch (java.lang.IllegalArgumentException e) {
+            // si le tileSet n'est pas valide ou introuvable on redirige l'utilisateur vers le selecteur de niveau
+        }
+
         tileMap.setPosition(0, 0);
 
-        bg = new Background("/Backgrounds/grassbg1.gif", 0.1);
+        // on charge le background
+        bg = new Background(pathToBackground, moveScale);
 
+        // on initialise les composant liés au joueur
         player = new Player(tileMap);
         player.setPosition(100, 100);
         //hud = new HUD(player);
 
-        populateLevel();
-
+        // on charge l'array d'explosion lié aux mort des ennemis
         explosions = new ArrayList<Explosion>();
-    }
 
-    private void populateLevel () {
-        ennemies = new ArrayList<Ennemy>();
-        ennemies.add(new Knight(tileMap));
-        ennemies.get(0).setPosition(200, 100);
+        populateLevel(ennemiesPositions);
     }
 
     @Override
-    public void update () {
+    public void update() {
         // updates the player
         player.update();
 
         tileMap.setPosition(
-            GamePanel.WIDTH / 2 - player.getPosX(),
-            GamePanel.HEIGHT / 2 - player.getPosY()
+                GamePanel.WIDTH / 2 - player.getPosX(),
+                GamePanel.HEIGHT / 2 - player.getPosY()
         );
 
         // update the background
@@ -70,7 +90,7 @@ public class Level1State extends GameState {
         for (int i = 0; i < ennemies.size(); i++) {
             ennemies.get(i).update();
             if (ennemies.get(i).isDead()) {
-                //System.out.println(ennemies.get(i).getPosX() + " " + ennemies.get(i).getPosY());
+                System.out.println(ennemies.get(i).getPosX() + " " + ennemies.get(i).getPosY());
                 explosions.add(new Explosion(ennemies.get(i).getPosX(), ennemies.get(i).getPosY()));
                 ennemies.remove(i);
                 i--;
@@ -92,6 +112,14 @@ public class Level1State extends GameState {
 
         /// check if player is alive
         if (player.isDead()) GSM.setState(GameStateManager.DEATHSCREEN);
+    }
+
+    public void populateLevel (int[][] positions) {
+        ennemies = new ArrayList<Ennemy>();
+        for (int i = 0; i < positions.length; i++) {
+            ennemies.add(new Knight(tileMap));
+            ennemies.get(i).setPosition(positions[i][0], positions[i][1]);
+        }
     }
 
     @Override

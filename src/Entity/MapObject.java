@@ -1,18 +1,21 @@
 package Entity;
 
+import Main.Game;
 import Main.GamePanel;
 import Main.TileMap.Tile;
 import Main.TileMap.TileMap;
+import com.sun.istack.internal.NotNull;
 
 import java.awt.*;
 
 public abstract class MapObject {
 	
 	// tile stuff
-	protected TileMap tileMap;
-	protected int tileSize;
-	protected double xMap;
+	TileMap tileMap;
+	private int tileSize;
+	private double xMap;
 	protected double yMap;
+	protected boolean outOfTheWorld;
 	
 	// position and vector
 	protected double posX;
@@ -64,9 +67,10 @@ public abstract class MapObject {
 	protected double stopJumpSpeed;
 	
 	// constructor
-	public MapObject(TileMap tm) {
+	public MapObject(@NotNull TileMap tm) {
 		tileMap = tm;
-		tileSize = tm.getTileSize(); 
+		tileSize = tm.getTileSize();
+		outOfTheWorld = false;
 	}
 	
 	public boolean intersects(MapObject o) {
@@ -91,31 +95,38 @@ public abstract class MapObject {
 	 */
 	public void calculateCorners(double x, double y) {
 		
-		int leftTile = (int)(x - cWidth / 2) / tileSize;
-		int rightTile = (int)(x + cWidth / 2 - 1) / tileSize;
-		int topTile = (int)(y - cHeight / 2) / tileSize;
-		int bottomTile = (int)(y + cHeight / 2 - 1) / tileSize;
-		
-		int tl = tileMap.getType(topTile, leftTile);
-		int tr = tileMap.getType(topTile, rightTile);
-		int bl = tileMap.getType(bottomTile, leftTile);
-		int br = tileMap.getType(bottomTile, rightTile);
-		
-		topLeft = tl == Tile.BLOCKED;
-		topRight = tr == Tile.BLOCKED;
-		bottomLeft = bl == Tile.BLOCKED;
-		bottomRight = br == Tile.BLOCKED;
+		if (!outOfTheWorld) {
+			int leftTile = (int)(x - cWidth / 2) / tileSize;
+			int rightTile = (int)(x + cWidth / 2 - 1) / tileSize;
+			int topTile = (int)(y - cHeight / 2) / tileSize;
+			int bottomTile = (int)(y + cHeight / 2 - 1) / tileSize;
+
+			try {
+				int tl = tileMap.getType(topTile, leftTile);
+				int tr = tileMap.getType(topTile, rightTile);
+				int bl = tileMap.getType(bottomTile, leftTile);
+				int br = tileMap.getType(bottomTile, rightTile);
+
+				topLeft = tl == Tile.BLOCKED;
+				topRight = tr == Tile.BLOCKED;
+				bottomLeft = bl == Tile.BLOCKED;
+				bottomRight = br == Tile.BLOCKED;
+			} catch (java.lang.ArrayIndexOutOfBoundsException e) {
+				this.outOfTheWorld = true;
+				System.out.println("out of the world");
+			}
+		}
 		
 	}
 	
-	public void checkTileMapCollision() {
+	public boolean checkTileMapCollision() {
 		
 		currCol = (int) posX / tileSize;
 		currRow = (int) posY / tileSize;
 		
 		xDest = posX + dx;
 		yDest = posY + dy;
-		
+
 		xTemp = posX;
 		yTemp = posY;
 		
@@ -168,7 +179,7 @@ public abstract class MapObject {
 			calculateCorners(posX, yDest + 1);
 			if(!bottomLeft && !bottomRight) falling = true;
 		}
-		
+		return false;
 	}
 	
 	public int getPosX() { return (int) posX; }
@@ -215,22 +226,24 @@ public abstract class MapObject {
 	 * @param g
 	 */
 	public void  draw (Graphics2D g) {
-		if (facingRight) {
-			g.drawImage(
-					animation.getImage(),
-					(int) (posX + xMap - width / 2),
-					(int) (posY + yMap - height / 2),
-					null
-			);
-		} else {
-			g.drawImage(
-					animation.getImage(),
-					(int) (posX + xMap - width / 2 + width),
-					(int) (posY + yMap - height / 2),
-					-width,
-					height,
-					null
-			);
+		if (!notOnScreen()) {
+			if (facingRight) {
+				g.drawImage(
+						animation.getImage(),
+						(int) (posX + xMap - width / 2),
+						(int) (posY + yMap - height / 2),
+						null
+				);
+			} else {
+				g.drawImage(
+						animation.getImage(),
+						(int) (posX + xMap - width / 2 + width),
+						(int) (posY + yMap - height / 2),
+						-width,
+						height,
+						null
+				);
+			}
 		}
 	}
 }

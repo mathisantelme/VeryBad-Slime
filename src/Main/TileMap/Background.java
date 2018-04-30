@@ -16,10 +16,10 @@ public class Background {
 
     private double moveScale;
 
-    public Background (String path, double ms) {
+    public Background (String path, double p_moveScale) {
         try {
             image = ImageIO.read(getClass().getResourceAsStream(path));
-            moveScale = ms;
+            moveScale = p_moveScale;
         } catch (Exception e) {
             e.printStackTrace();
         }

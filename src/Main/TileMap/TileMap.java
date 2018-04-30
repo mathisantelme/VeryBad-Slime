@@ -47,7 +47,7 @@ public class TileMap {
      * charge le fichier des tiles en memoire
      * @param path
      */
-    public void loadTiles (String path) {
+    public void loadTiles (String path) throws java.lang.IllegalArgumentException {
         try {
             tileSet = ImageIO.read(getClass().getResourceAsStream(path));
             nbTilesAcross = tileSet.getWidth() / tileSize;
@@ -73,6 +73,7 @@ public class TileMap {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            throw new java.lang.IllegalArgumentException();
         }
     }
 
@@ -80,7 +81,7 @@ public class TileMap {
      * charge une map en memoire
      * @param path
      */
-    public void loadMap (String path) {
+    public void loadMap (String path) throws java.lang.IllegalArgumentException {
         try {
             InputStream in = getClass().getResourceAsStream(path);
             BufferedReader br = new BufferedReader(new InputStreamReader(in));
@@ -107,6 +108,7 @@ public class TileMap {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            throw new java.lang.IllegalArgumentException();
         }
     }
 
@@ -115,7 +117,7 @@ public class TileMap {
     public int getPosY () { return (int)posY; }
     public int getWidth () { return width; }
     public int getHeight () { return height; }
-    public int getType (int row, int col) {
+    public int getType (int row, int col) throws java.lang.ArrayIndexOutOfBoundsException {
         int rc = map[row][col];
         int r = rc / nbTilesAcross;
         int c = rc % nbTilesAcross;
