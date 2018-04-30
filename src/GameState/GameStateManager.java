@@ -13,9 +13,8 @@ public class GameStateManager {
 
     public static final int MENU = 0;
     public static final int EDITOR = 1;
-    public static final int LEVEL_SELECTOR = 2;
-    public static final int LEVEL_01 = 3;
-    public static final int DEATHSCREEN = 4;
+    public static final int LEVEL_01 = 2;
+    public static final int DEATHSCREEN = 3;
 
     // les differents levels present dans le jeu
     public static ArrayList<GameState> levels = new ArrayList<GameState>();

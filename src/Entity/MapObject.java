@@ -184,6 +184,8 @@ public abstract class MapObject {
 	
 	public int getPosX() { return (int) posX; }
 	public int getPosY() { return (int) posY; }
+	public int getCurrRow () { return currRow; }
+	public int getCurrCol () { return currCol; }
 	public int getWidth() { return width; }
 	public int getHeight() { return height; }
 	public int getCWidth() { return cWidth; }

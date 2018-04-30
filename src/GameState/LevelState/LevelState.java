@@ -26,6 +26,8 @@ public class LevelState extends GameState {
 
     protected ArrayList<Ennemy> ennemies;
     protected ArrayList<Explosion> explosions;
+
+    protected int[] endPos;
     //===============================================
 
     public LevelState (GameStateManager p_GSM) {
@@ -42,7 +44,7 @@ public class LevelState extends GameState {
             String pathToMap, String pathToTileSet, int tileSize,
             String pathToBackground, double moveScale,
             int[][] ennemiesPositions,
-            double[] playerPos, double[] endPos
+            double[] playerPos, int[] endPos
     ) {
         // initialisation de tileMap
         tileMap = new TileMap(tileSize);
@@ -53,7 +55,7 @@ public class LevelState extends GameState {
         } catch (java.lang.IllegalArgumentException e) {
             // si le fichier .map n'est pas valide ou introuvable on redirige l'utilisateur vers le selecteur de niveau
             System.out.print("The specified path isn't valid please specify valid path for a .map file");
-            this.GSM.setState(GameStateManager.LEVEL_SELECTOR);
+            this.GSM.setState(GameStateManager.MENU);
         }
 
         try {
@@ -65,7 +67,12 @@ public class LevelState extends GameState {
         tileMap.setPosition(0, 0);
 
         // on charge le background
-        bg = new Background(pathToBackground, moveScale);
+        try {
+            bg = new Background(pathToBackground, moveScale);
+        } catch (java.lang.IllegalArgumentException e) {
+            System.out.println("path to backgroudn isn't valid please specify valid path for background");
+            GSM.setState(GameStateManager.MENU);
+        }
 
         // on initialise les composant liés au joueur
         player = new Player(tileMap);
@@ -75,6 +82,8 @@ public class LevelState extends GameState {
         // on charge l'array d'explosion lié aux mort des ennemis
         explosions = new ArrayList<Explosion>();
 
+        this.endPos = endPos;
+
         populateLevel(ennemiesPositions);
     }
 
@@ -82,6 +91,7 @@ public class LevelState extends GameState {
     public void update() {
         // updates the player
         player.update();
+        if (player.getCurrCol() == endPos[0] && player.getCurrRow() == endPos[1]) GSM.setState(GameStateManager.MENU);
 
         tileMap.setPosition(
                 GamePanel.WIDTH / 2 - player.getPosX(),

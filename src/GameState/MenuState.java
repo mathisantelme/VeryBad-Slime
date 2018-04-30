@@ -13,7 +13,6 @@ public class MenuState extends GameState {
     private String title = "VeryBad Slime";
     private String[] options = {
         "Start",
-        "Level Selector",
         "Editor",
         "Quit"
     };
@@ -44,11 +43,9 @@ public class MenuState extends GameState {
                 GSM.setState(GameStateManager.LEVEL_01);
                 break;
             case 1:
-                break;
-            case 2:
                 GSM.setState(GameStateManager.EDITOR);
                 break;
-            case 3:
+            case 2:
                 System.exit(0);
                 break;
         }

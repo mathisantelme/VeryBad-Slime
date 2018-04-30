@@ -16,12 +16,12 @@ public class Background {
 
     private double moveScale;
 
-    public Background (String path, double p_moveScale) {
+    public Background (String path, double p_moveScale) throws java.lang.IllegalArgumentException {
         try {
             image = ImageIO.read(getClass().getResourceAsStream(path));
             moveScale = p_moveScale;
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new java.lang.IllegalArgumentException();
         }
     }
 

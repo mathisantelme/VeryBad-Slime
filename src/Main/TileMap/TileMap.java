@@ -72,7 +72,6 @@ public class TileMap {
                 tiles[1][col] = new Tile(subImage, Tile.BLOCKED);
             }
         } catch (Exception e) {
-            e.printStackTrace();
             throw new java.lang.IllegalArgumentException();
         }
     }
@@ -107,7 +106,6 @@ public class TileMap {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
             throw new java.lang.IllegalArgumentException();
         }
     }
